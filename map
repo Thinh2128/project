@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Map with Notifications</title>
+    
+    <!-- Leaflet CSS (for map styling) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+
+    <!-- Leaflet Routing Machine CSS (for directions) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+    
+    <!-- Push.js for Notifications -->
+    <script src="https://cdn.pushjs.org/dist/latest/push.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        /* Map container */
+        #map {
+            width: 100%;
+            height: 80vh;
+        }
+
+        /* Notification button */
+        #notify-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            z-index: 100;
+        }
+
+        #notify-btn:hover {
+            background-color: #45a049;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Map container -->
+    <div id="map"></div>
+
+    <!-- Notification Button -->
+    <button id="notify-btn">Send Notification</button>
+
+    <footer>
+        &copy; 2025 Geo-guardMap. All rights reserved.
+    </footer>
+
+    <!-- Leaflet JS (Map functionality) -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    
+    <!-- Leaflet Routing Machine JS (For Directions) -->
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+
+    <script>
+        // Initialize the map
+        var map = L.map('map').setView([10.9848, 106.6815], 13);  // Coordinates for Thủ Dầu Một, Bình Dương, Vietnam
+
+        // Set up the OpenStreetMap tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Marker to show selected location
+        var marker;
+
+        // Add a click event to select a location on the map
+        map.on('click', function(e) {
+            if (marker) {
+                map.removeLayer(marker); // Remove the existing marker
+            }
+            marker = L.marker(e.latlng).addTo(map); // Add new marker
+            marker.bindPopup('You selected this location: ' + e.latlng.toString()).openPopup();
+        });
+
+        // Add a routing control to show directions from one point to another
+        var control = L.Routing.control({
+            waypoints: [
+                L.latLng(10.9848, 106.6815), // Start point (Thủ Dầu Một, Bình Dương)
+                L.latLng(10.7797, 106.6958)  // End point (nearby area, can be changed)
+            ],
+            routeWhileDragging: true
+        }).addTo(map);
+
+        // Button to send a notification
+        document.getElementById('notify-btn').addEventListener('click', function() {
+            Push.create("New Location Selected", {
+                body: "You have clicked a location on the map!",
+                icon: 'https://cdn-icons-png.flaticon.com/512/2918/2918037.png',
+                timeout: 4000, // Timeout before the notification disappears
+            });
+        });
+    </script>
+</body>
+</html>
